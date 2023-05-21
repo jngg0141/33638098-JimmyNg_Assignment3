@@ -1,0 +1,152 @@
+---
+title: "Global Health "
+author: "Group 4"
+institute: Department of Econometrics and Business Statistics
+output:
+  pdf_document:
+    highlight: tango
+    number_sections: yes
+    toc: yes
+    toc_depth: 2
+  bookdown::html_document2:
+    df_print: paged
+    toc: yes
+    toc_depth: '2'
+subtitle: Tutorial 7
+bibliograpy: references.bib
+header-includes:
+- \usepackage{titling}
+- \pretitle{\begin{center} \includegraphics[width=5in,height=13in]{figs/front.jpg}\LARGE\\}
+- \posttitle{\end{center}}
+- \usepackage{fontawesome}
+- \usepackage[most]{tcolorbox}
+- \usepackage{xcolor}
+- \usepackage{sectsty}
+- \sectionfont{\color{olive}}
+- \usepackage{verbatim}
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+```
+
+```{=tex}
+\section*{Tutorial objectives:}
+\begin{tcolorbox}
+ \begin{itemize}
+   \item Practice version control workflow.
+   \item Ammend commits.
+   \item Visit past commits and create branches from those.
+   \item Merging branches and deal with conflicts.
+   \item Practice pull requests.
+   \item Use GitKraken as a tool to visualize trees.
+   \item Use git reset and git revert.
+ \end{itemize}
+\end{tcolorbox}
+```
+\clearpage
+
+```{r}
+library(tidyverse)
+library(readr)
+library(knitr)
+library(kableExtra)
+library(dplyr)
+```
+# Executive summary
+
+The goal of this study is to demonstrate the relationship between child mortality rate and health expenditure per capita. There is a negative correlation between them because an increase of health expenditure would lower the child mortality rate, and vice versa. One of the main factor that affects this relationship would be corruption in the government sector, where government fund allocation and policies affects citizen's accessibility on health.
+
+# Introduction
+
+Health is one of the important aspect of having a good quality of life by avoiding illness or injury. This leads to our main topic global health. One of the health outcomes would be life expectancy as it measures of aggregate health in populations. However, I will be focus on child mortality to focus on health outcomes for children. Hence, my research question would be how does health expenditure affect Global Health, specifically on child mortality.
+
+# Methodology
+
+In this study, I will be using quantitative analysis to investigate the connection between child mortality and health expenditure per capita. The study will use two different graph to examine to relationship between these two. The data set that I used here is taken from Our World in Data website. Out of the five subtopic, I will be using Child Mortality data set @owidhealthmeta from the Global Health topic, and health expenditure data set from health expenditure topic to demonstrate a correlation between them. Health expenditure per Capita refers to the money being spent on health in a country, covering both individual and population as a whole. 2016 is the year that will be use in the graph through using the filter function, as it is the most recent year provided by Our World in Data website The hypothesis would be the higher the health expenditure per capita is, the lower the child mortality would be. Thus, it is expected that there will be a negative relationship throughout the analysis.
+
+Through using the summarise function to find the average of child_mortality, there are 139 countries that are below average and 72 countries that are above average. Based on the child mortality graph, many countries are shown to be on the lower scale that indicates low child mortality.
+
+```{r read csv}
+child_mortality_raw <- read.csv("data/child-mortality.csv")
+```
+```{r filtering 2016 data, renaming into simpler name}
+child_mortality<- child_mortality_raw %>%
+  filter(Year == 2016, na.rm = TRUE ) %>% 
+  na.omit() %>%
+  rename("child_mortality" = "Child.mortality..Select.Gapminder..v10...2017.")
+```
+
+```{r}
+child_mor_avg <- child_mortality %>%
+  summarise(child_mortality_avg = mean(child_mortality))
+```
+
+```{r out.width= '100%', echo = TRUE}
+knitr::include_graphics("figs/child_mortality_average_table.PNG")
+```
+
+
+```{r Countries that are below and above the average child mortality}
+below_avg_child_mortality <-
+  child_mortality %>%
+  filter(child_mortality <= 2.864269)
+
+count(below_avg_child_mortality)
+
+above_avg_child_mortality <-
+  child_mortality %>%
+   filter(child_mortality >= 2.864269)
+
+count(above_avg_child_mortality)
+```
+
+
+
+```{r child mortality plot}
+ggplot(child_mortality, 
+aes(x = Entity , y = child_mortality)) + 
+geom_point() + ggtitle("Child Mortality")
+```
+
+
+# Results
+```{r include=FALSE}
+CM_HE_raw <- read.csv("data/child-mortality-vs-health-expenditure.csv")
+```
+
+```{r}
+CM_HE <- CM_HE_raw %>% 
+  filter(Year >= 2016, na.rm = TRUE) %>% na.omit()
+
+CM_HE <- CM_HE %>% rename( "Mortality_Rate" = "Mortality.rate..under.5..per.1.000.live.births.", "Current_Health_expenditure_per_capita" =  "Current.health.expenditure.per.capita..PPP..current.international..."  )
+
+
+```
+
+```{r}
+ggplot(CM_HE, 
+aes(x = Current_Health_expenditure_per_capita , y = Mortality_Rate) ) + 
+geom_point()+geom_smooth() + ggtitle("Relationship between mortality rate and current health expenditure per capita"
+)
+
+```
+As a result, there is a correlation between child mortality rate and the current health expenditure per capita @owidfinancinghealthcare. The relationship between them would be negative as an increase of current health expenditure would decrease the child mortality rate. According to the graph above, majority of the country seems to have low health expenditure and have high child mortality rate. Which supports the hypothesis of this study. However, there are other countries with low child mortality rate with low current health expenditure per capita.
+
+
+# Discussion
+
+It can be seen that countries with the same health expenditure have both high and low child mortality rate. Based on the graph, there are some limitations that creates exception where some countries have low child mortality rate and low health expenditure. That is because these countries have healthy lifestyle, good welfare, and strong primary health care systems. On the other hand, one of the reason that countries with low health expenditure has high child mortality is because
+government policy plays a significantly role in this relationship, especially corruption. Corruption is a complicated issue that negatively impact the quality of citizen's life, such as health care services and services. According to Beeson @plos, corruptions is one of the main causes that affects Millennium Development Goal's target meet. It is also stated that corruption affect on health sector like education of health professionals, distribution of drugs in affordable price, purchase of medical equipment, and many more. 
+
+# Conclusion 
+
+Child mortality rates and health expenditures are negatively related. Countries with higher health expenditures tend to have lower child mortality rates, because health expenditures is the key to provide decent healthcare services to prevent diseases and illnesses that leads to child mortality. Corruption is one of main factor that can significantly affect the relationship, low corruption would mean that government does allocate funds into health sector that will increase the health and wellbeing of citizens. Thus, reducing child mortality.
+
+# Recommendations
+
+Government should allocated their funds to appropriate sector, or citizens should be aware when voting for their government. However, corruption will always exist as it is a complicated issue. Governments and citizens should be aware of this relationship of how health and corruption are inter-related.
+
+#Reference
+
+
